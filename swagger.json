@@ -1,0 +1,2240 @@
+{
+  "host": "registry.ng.bluemix.net",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Management interface for IBM Cloud Container Registry",
+    "license": {
+      "name": "(C) Copyright IBM Corp. 2017 All Rights Reserved."
+    },
+    "termsOfService": "https://console.ng.bluemix.net/docs/navigation/notices.html#terms",
+    "title": "IBM Cloud Container Registry API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/auth": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "$ref": "#/definitions/AuthResponse"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "operationId": "getAuth",
+        "summary": "Gets authorization options for the targeted account."
+      },
+      "patch": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "A JSON document containing the requested updates.",
+            "in": "body",
+            "name": "AuthorizationOptions",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthResponse",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "204": {
+            "description": "Description was not specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "403": {
+            "description": "You do not have access to perform the requested operation. You must have either Manager or Billing Manager roles on the targeted account to perform this action.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "operationId": "setAuth",
+        "summary": "Updates authorization options for the targeted account."
+      }
+    },
+    "/api/v1/builds": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The IBM Cloud IAM refresh token that you receive when you log in to IBM Cloud. Your refresh token is stored in your IBM Cloud config file: `~/.bluemix/config.json`",
+            "in": "header",
+            "name": "RefreshToken",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The full name for the image that you want to build, including the registry URL and namespace.",
+            "in": "query",
+            "name": "t",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Specify the location of the Dockerfile relative to the build context. If not specified, the default is 'PATH/Dockerfile', where PATH is the root of the build context.",
+            "in": "query",
+            "name": "f",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "If set to true, cached image layers from previous builds are not used in this build. Use this option if you expect the result of commands that run in the build to change.",
+            "in": "query",
+            "name": "nocache",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "If set to true, the base image is pulled even if an image with a matching tag already exists on the build host. The base image is specified by using the FROM keyword in your Dockerfile. Use this option to update the version of the base image on the build host.",
+            "in": "query",
+            "name": "pull",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "If set to true, the filesystem of the built image is reduced to one layer before it is pushed to the registry. Use this option if the number of layers in your image is close to the maximum for your storage driver.",
+            "in": "query",
+            "name": "squash",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "A JSON key-value structure that contains build arguments. The value of the build arguments are available as environment variables when you specify an `ARG` line which matches the key in your Dockerfile.",
+            "in": "query",
+            "name": "buildargs",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "If set to true, build output is suppressed unless an error occurs.",
+            "in": "query",
+            "name": "quiet",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A stream of JSON objects that contain the output from the build host.",
+            "schema": {
+              "$ref": "#/definitions/buildoutput"
+            }
+          },
+          "500": {
+            "description": "Internal server error or build failure",
+            "schema": {
+              "$ref": "#/definitions/errordetail"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "builds"
+        ],
+        "operationId": "ImageBuild",
+        "summary": "Build a Docker image."
+      }
+    },
+    "/api/v1/images": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Lists images that are stored in the specified namespace only. Query multiple namespaces by specifying this option for each namespace. If this option is not specified, images from all namespaces in the specified IBM Cloud account are listed.",
+            "in": "query",
+            "name": "namespace",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "Includes IBM-provided public images in the list of images. If this option is not specified, private images are listed only. If this option is specified more than once, the last parsed setting is the setting that is used.",
+            "in": "query",
+            "name": "includeIBM",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "Includes private images in the list of images. If this option is not specified, private images are listed. If this option is specified more than once, the last parsed setting is the setting that is used.",
+            "in": "query",
+            "name": "includePrivate",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "Displays Vulnerability Advisor status for the listed images. If this option is specified more than once, the last parsed setting is the setting that is used.",
+            "in": "query",
+            "name": "vulnerabilities",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "Lists images that are stored in the specified repository, under your namespaces. Query multiple repositories by specifying this option for each repository. If this option is not specified, images from all repos are listed.",
+            "in": "query",
+            "name": "repository",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/RemoteAPIImage"
+              },
+              "type": "array"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "403": {
+            "description": "You do not have access to the specified namespace. Choose another namespace.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "404": {
+            "description": "No namespaces were found for the targeted account. Add a namespace or target a different account. Alternatively, specify the option to include IBM-provided public images.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "images"
+        ],
+        "operationId": "imageList",
+        "summary": "Lists all images in namespaces in a targeted IBM Cloud account."
+      }
+    },
+    "/api/v1/images/{image}": {
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The full IBM Cloud registry path to the image that you want to delete, including its tag. If you do not provide a specific tag, the version with the `latest` tag is removed.",
+            "in": "path",
+            "name": "image",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "$ref": "#/definitions/ImageDeleteResult"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "403": {
+            "description": "You do not have authorization to access the specified namespace.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "404": {
+            "description": "The specified image was not found. Check the spelling of the specified image.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "415": {
+            "description": "Inspecting a manifest-list is not supported",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "images"
+        ],
+        "operationId": "ImageDelete",
+        "summary": "Remove a Docker image from the registry."
+      }
+    },
+    "/api/v1/images/{image}/json": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The full IBM Cloud registry path to the image that you want to inspect. Run `bx cr images` or call the `GET /images/json` endpoint to review images that are in the registry.",
+            "in": "path",
+            "name": "image",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "$ref": "#/definitions/ImageInspection"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "403": {
+            "description": "You do not have authorization to access the specified namespace.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "404": {
+            "description": "The specified image was not found. Check the spelling of the specified image.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "images"
+        ],
+        "operationId": "imageInspect",
+        "summary": "Inspect a Docker image in the private registry."
+      }
+    },
+    "/api/v1/images/{image}/vulnerabilities": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The full IBM Cloud registry path to the image that you want to inspect. Run `bx cr images`` or call the `GET /images/json` endpoint to review images that are in the registry.",
+            "in": "path",
+            "name": "image",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Specifies to include advisory compliance checks in the report.",
+            "in": "query",
+            "name": "advisory",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "Specifies to include all checks in the report. If not specified or false, only failing checks are returned.",
+            "in": "query",
+            "name": "all",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "$ref": "#/definitions/ImageAssessment"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "403": {
+            "description": "You do not have authorization to access the specified namespace.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "404": {
+            "description": "The specified image was not found. Check the spelling of the specified image.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "images"
+        ],
+        "operationId": "imageVulnerabilities",
+        "summary": "View the vulnerability report for a Docker image in the private registry."
+      }
+    },
+    "/api/v1/messages": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "204": {
+            "description": "There are no messages to display.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "messages"
+        ],
+        "operationId": "getMessages",
+        "summary": "returns any published system messages"
+      }
+    },
+    "/api/v1/namespaces": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "namespaces"
+        ],
+        "operationId": "getNamespace",
+        "summary": "Lists authorized namespaces in the targeted IBM Cloud account."
+      }
+    },
+    "/api/v1/namespaces/{namespace}": {
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The namespace that you want to delete.",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "204": {
+            "description": "Description was not specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "Your IBM Cloud bearer token is not valid for the targeted account. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "403": {
+            "description": "The specified namespace is not owned by the targeted account.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "namespaces"
+        ],
+        "operationId": "deleteNamespace",
+        "summary": "Deletes the IBM Cloud Container Registry namespace from the targeted IBM Cloud account, and removes all images that were in that namespace."
+      },
+      "put": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Adds the specified namespace to your IBM Cloud account.",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The namespace is already assigned to your IBM Cloud account.",
+            "schema": {
+              "$ref": "#/definitions/nsResponse"
+            }
+          },
+          "201": {
+            "description": "The namespace was successfully added to your IBM Cloud account.",
+            "schema": {
+              "$ref": "#/definitions/nsResponse"
+            }
+          },
+          "400": {
+            "description": "CRN0007E: The requested namespace is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "403": {
+            "description": "CRN0008E: The requested namespace is blacklisted. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "409": {
+            "description": "The requested namespace is already in use. Request a different namespace.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "namespaces"
+        ],
+        "operationId": "addNamespace",
+        "summary": "Adds a namespace to the targeted IBM Cloud account."
+      }
+    },
+    "/api/v1/plans": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "$ref": "#/definitions/PlanResponse"
+              }
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "plans"
+        ],
+        "operationId": "getPlans",
+        "summary": "Gets plans for the targeted account."
+      },
+      "patch": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "A JSON document containing the requested updates.",
+            "in": "body",
+            "name": "Plan",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlanResponse",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "403": {
+            "description": "You do not have access to perform the requested operation. You must have either Manager or Billing Manager roles on the targeted account to perform this action.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "plans"
+        ],
+        "operationId": "setPlan",
+        "summary": "Updates plans for the targeted account."
+      }
+    },
+    "/api/v1/quotas": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "$ref": "#/definitions/QuotaAPIResponse"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "quotas"
+        ],
+        "operationId": "getQuota",
+        "summary": "Gets quotas for the targeted account."
+      },
+      "patch": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "A JSON document containing the requested updates.",
+            "in": "body",
+            "name": "Quota",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/QuotaResponse",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "403": {
+            "description": "You do not have access to perform the requested operation. You must have either Manager or Billing Manager roles on the targeted account to perform this action.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "quotas"
+        ],
+        "operationId": "setQuota",
+        "summary": "Updates quotas for the targeted account."
+      }
+    },
+    "/api/v1/tokens": {
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "Specifies a second owner field for the token. If this option is specified more than once, the last parsed setting is the setting that is used.",
+            "in": "query",
+            "name": "secondaryOwner",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "204": {
+            "description": "Description was not specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "A required parameter is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "tokenDeleteOrg",
+        "summary": "revokes all registry access tokens that match a query"
+      },
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "$ref": "#/definitions/ListTokensResp"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "tokenListOwner",
+        "summary": "lists all valid registry access tokens for an owner"
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Specifies a description for the token so it can be more easily identified. If this option is specified more than once, the last parsed setting is the setting that is used.",
+            "in": "query",
+            "name": "description",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "When specified, the access token does not expire. If this option is specified more than once, the last parsed setting is the setting that is used.",
+            "in": "query",
+            "name": "permanent",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "When specified, the token provides write access to registry namespaces in your IBM Cloud account. If this option is not specified, or is set to false, the token provides read-only access. If this option is specified more than once, the last parsed setting is the setting that is used.",
+            "in": "query",
+            "name": "write",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "201": {
+            "description": "Description was not specified",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "tokenIssue",
+        "summary": "issues a registry access token for the targeted IBM Cloud account"
+      }
+    },
+    "/api/v1/tokens/{token}": {
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The token that you want to delete.",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "204": {
+            "description": "Description was not specified",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "404": {
+            "description": "The specific token was not found in your account. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "tokenDelete",
+        "summary": "revokes the specified registry access token"
+      }
+    },
+    "/api/v1/tokens/{uuid}": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The IBM Cloud IAM access token that you receive when you log in to IBM Cloud. Run `bx iam oauth-tokens` to retrieve your access token, which is prefixed with 'Bearer'.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The unique ID for your IBM Cloud account.",
+            "in": "header",
+            "name": "Account",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The uuid of the token you wish to retrieve",
+            "in": "path",
+            "name": "uuid",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Description was not specified",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Token",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "A required header is missing. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "401": {
+            "description": "You are not authorized to view the requested resource, or your IBM Cloud bearer token is invalid. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "404": {
+            "description": "No token with the specific ID was found in your account. Correct the request and try again.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          },
+          "503": {
+            "description": "Unable to authenticate with IBM Cloud. Try again later.",
+            "schema": {
+              "$ref": "#/definitions/RequestError"
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "tokenRetrieve",
+        "summary": "retrieves the registry token with the given UUID"
+      }
+    }
+  },
+  "definitions": {
+    "RequestError": {
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "rc": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "request-id": {
+          "type": "string"
+        }
+      }
+    },
+    "AuthResponse": {
+      "properties": {
+        "iam_authz": {
+          "type": "boolean",
+          "description": "Enable role based authorization when authenticating with IBM Cloud IAM"
+        }
+      }
+    },
+    "PlanResponse": {
+      "properties": {
+        "plan": {
+          "type": "string"
+        }
+      }
+    },
+    "PlanResponses": {
+      "description": "PlanResponses",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PlanResponse"
+      }
+    },
+    "QuotaAPIResponse": {
+      "properties": {
+        "limit": {
+          "$ref": "#/definitions/QuotaResponse"
+        },
+        "usage": {
+          "$ref": "#/definitions/QuotaResponse"
+        }
+      }
+    },
+    "QuotaResponse": {
+      "properties": {
+        "store": {
+          "type": "integer",
+          "format": "uint64",
+          "description": "The storage amount in bytes"
+        },
+        "traffic": {
+          "type": "integer",
+          "format": "uint64",
+          "description": "The traffic bandwidth amount in bytes"
+        }
+      }
+    },
+    "SetError": {
+      "properties": {
+        "errors": {
+          "items": {
+            "$ref": "#/definitions/RequestError"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "Token": {
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "Tokens": {
+      "description": "Tokens",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Token"
+      }
+    },
+    "buildoutput": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "progressDetail": {
+          "$ref": "#/definitions/progressdetail"
+        },
+        "status": {
+          "type": "string"
+        },
+        "stream": {
+          "type": "string"
+        }
+      }
+    },
+    "errordetail": {
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        },
+        "errorDetail": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "rc": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "request-id": {
+          "type": "string"
+        }
+      }
+    },
+    "nsResponse": {
+      "properties": {
+        "namespace": {
+          "type": "string"
+        }
+      }
+    },
+    "progressdetail": {
+      "properties": {
+        "current": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        }
+      }
+    },
+    "ListTokensResp": {
+      "properties": {
+        "tokens": {
+          "items": {
+            "$ref": "#/definitions/TokenDoc"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "TokenDoc": {
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "encrypted_token": {
+          "type": "string"
+        },
+        "expiry": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "revoked": {
+          "type": "boolean"
+        },
+        "secondary_owner": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "Config": {
+      "properties": {
+        "ArgsEscaped": {
+          "type": "boolean",
+          "description": "True if command is already escaped (Windows specific)"
+        },
+        "AttachStderr": {
+          "type": "boolean",
+          "description": "If true, standard error is attached"
+        },
+        "AttachStdin": {
+          "type": "boolean",
+          "description": "If true, standard input is attached, which makes possible user interaction"
+        },
+        "AttachStdout": {
+          "type": "boolean",
+          "description": "If true, standard output is attached"
+        },
+        "Cmd": {
+          "description": "Command that is run when starting the container",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Domainname": {
+          "description": "The FQDN for the container",
+          "type": "string"
+        },
+        "Entrypoint": {
+          "description": "Entrypoint to run when starting the container",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Env": {
+          "description": "List of environment variables to set in the container",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ExposedPorts": {
+          "description": "A list of exposed ports in a format [123:{},456:{}]",
+          "items": {
+            "$ref": "#/definitions/Set"
+          },
+          "type": "array"
+        },
+        "Healthcheck": {
+          "$ref": "#/definitions/HealthConfig",
+          "description": "Describes how to check that the container is healthy"
+        },
+        "Hostname": {
+          "description": "The host name of the container",
+          "type": "string"
+        },
+        "Image": {
+          "description": "Name of the image as it was passed by the operator (eg. could be symbolic)",
+          "type": "string"
+        },
+        "Labels": {
+          "description": "List of labels set to this container",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "MacAddress": {
+          "description": "The MAC Address of the container",
+          "type": "string"
+        },
+        "NetworkDisabled": {
+          "type": "boolean",
+          "description": "If true, containers are not given network access"
+        },
+        "OnBuild": {
+          "description": "ONBUILD metadata that were defined on the image Dockerfile https://docs.docker.com/engine/reference/builder/#onbuild",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "OpenStdin": {
+          "type": "boolean",
+          "description": "Open stdin"
+        },
+        "Shell": {
+          "description": "Shell for shell-form of RUN, CMD, ENTRYPOINT",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "StdinOnce": {
+          "type": "boolean",
+          "description": "If true, close stdin after the 1 attached client disconnects."
+        },
+        "StopSignal": {
+          "description": "Signal to stop a container",
+          "type": "string"
+        },
+        "StopTimeout": {
+          "description": "Timeout (in seconds) to stop a container",
+          "format": "int32",
+          "type": "integer"
+        },
+        "Tty": {
+          "type": "boolean",
+          "description": "Attach standard streams to a tty, including stdin if it is not closed."
+        },
+        "User": {
+          "description": "The user that will run the command(s) inside the container",
+          "type": "string"
+        },
+        "Volumes": {
+          "description": "List of volumes (mounts) used for the container",
+          "items": {
+            "$ref": "#/definitions/Set"
+          },
+          "type": "array"
+        },
+        "WorkingDir": {
+          "description": "Current working directory (PWD) in the command will be launched",
+          "type": "string"
+        }
+      }
+    },
+    "HealthConfig": {
+      "properties": {
+        "Interval": {
+          "$ref": "#/definitions/time.Duration"
+        },
+        "Retries": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Test": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Timeout": {
+          "$ref": "#/definitions/time.Duration"
+        }
+      }
+    },
+    "ImageInspection": {
+      "properties": {
+        "Architecture": {
+          "description": "The processor architecture used to build this image, and required to run it",
+          "type": "string"
+        },
+        "Author": {
+          "description": "The author of the image",
+          "type": "string"
+        },
+        "Comment": {
+          "description": "A plain text description of the image",
+          "type": "string"
+        },
+        "Config": {
+          "$ref": "#/definitions/Config",
+          "description": "Configuration metadata for the image"
+        },
+        "Container": {
+          "description": "The ID of the container which created this image",
+          "type": "string"
+        },
+        "ContainerConfig": {
+          "$ref": "#/definitions/Config",
+          "description": "The default configuration for containers started from this image"
+        },
+        "Created": {
+          "description": "The unix timestamp for the date when the image was created",
+          "type": "string"
+        },
+        "DockerVersion": {
+          "description": "The Docker version used to build this image",
+          "type": "string"
+        },
+        "Id": {
+          "description": "The image ID",
+          "type": "string"
+        },
+        "Os": {
+          "description": "The operating system family used to build this image, and required to run it",
+          "type": "string"
+        },
+        "OsVersion": {
+          "description": "The version of the operating system used to build this image",
+          "type": "string"
+        },
+        "Parent": {
+          "description": "The ID of the base image for this image",
+          "type": "string"
+        },
+        "RootFS": {
+          "$ref": "#/definitions/RootFS",
+          "description": "Metadata describing the root filesystem for the image"
+        },
+        "Size": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The size of the image in bytes"
+        },
+        "VirtualSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The sum of the size of each layer in the image in bytes"
+        }
+      }
+    },
+    "RootFS": {
+      "properties": {
+        "BaseLayer": {
+          "description": "Descriptor for the base layer in the image",
+          "type": "string"
+        },
+        "Layers": {
+          "description": "Descriptors for each layer in the image",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Type": {
+          "description": "The type of filesystem",
+          "type": "string"
+        }
+      }
+    },
+    "Set": {},
+    "RemoteAPIImage": {
+      "properties": {
+        "ConfigurationIssueCount": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Created": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "DigestTags": {
+          "items": {
+            "$ref": "#/definitions/Tags"
+          },
+          "type": "array"
+        },
+        "ExemptIssueCount": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Id": {
+          "type": "string"
+        },
+        "IssueCount": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Labels": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ParentId": {
+          "type": "string"
+        },
+        "RepoDigests": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "RepoTags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Size": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "VirtualSize": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "VulnerabilityCount": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Vulnerable": {
+          "type": "string"
+        }
+      }
+    },
+    "Tags": {},
+    "ImageDeleteResult": {
+      "properties": {
+        "Untagged": {
+          "type": "string"
+        }
+      }
+    },
+    "Compliance": {
+      "properties": {
+        "compliance_violations": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "compliant": {
+          "type": "boolean"
+        },
+        "execution_status": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "total_compliance_rules": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "ComplianceResult": {
+      "properties": {
+        "compliant": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "policy_mandated": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "ImageAssessment": {
+      "properties": {
+        "assessment": {
+          "$ref": "#/definitions/ImageAssessmentResult"
+        },
+        "detail": {
+          "$ref": "#/definitions/ImageDetails"
+        },
+        "metadata": {
+          "$ref": "#/definitions/ImageMetadata"
+        },
+        "summary": {
+          "$ref": "#/definitions/ImageSummary"
+        }
+      }
+    },
+    "ImageAssessmentResult": {
+      "properties": {
+        "raw_verdict_results": {
+          "items": {
+            "$ref": "#/definitions/ComplianceResult"
+          },
+          "type": "array"
+        },
+        "vulnerable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ImageDetails": {
+      "properties": {
+        "compliance": {
+          "items": {
+            "$ref": "#/definitions/ComplianceResult"
+          },
+          "type": "array"
+        },
+        "malware": {
+          "items": {
+            "$ref": "#/definitions/ComplianceResult"
+          },
+          "type": "array"
+        },
+        "vulnerability": {
+          "items": {
+            "$ref": "#/definitions/VulnerabilityDetails"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "ImageMetadata": {
+      "properties": {
+        "complete": {
+          "type": "boolean"
+        },
+        "crawled_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "os_supported": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ImageSummary": {
+      "properties": {
+        "compliance": {
+          "$ref": "#/definitions/Compliance"
+        },
+        "malware": {
+          "$ref": "#/definitions/MalwareCompliance"
+        },
+        "secureconfig": {
+          "$ref": "#/definitions/SecureConfig"
+        },
+        "vulnerability": {
+          "$ref": "#/definitions/Vulnerabilities"
+        }
+      }
+    },
+    "MalwareCompliance": {
+      "properties": {
+        "compliant": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "PackageVulnerability": {
+      "properties": {
+        "cveid": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "SecureConfig": {
+      "properties": {
+        "correct_output": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "misconfigured": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "total_output_docs": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "Vulnerabilities": {
+      "properties": {
+        "total_packages": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "total_usns_for_distro": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "vulnerable_packages": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "vulnerable_usns": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "VulnerabilityDetails": {
+      "properties": {
+        "package_name": {
+          "type": "string"
+        },
+        "vulnerabilities": {
+          "items": {
+            "$ref": "#/definitions/PackageVulnerability"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "time.Duration": {
+      "properties": {
+        
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Authentication & authorization management",
+      "name": "auth"
+    },
+    {
+      "description": "Builds",
+      "name": "builds"
+    },
+    {
+      "description": "Image management",
+      "name": "images"
+    },
+    {
+      "description": "Status messages",
+      "name": "messages"
+    },
+    {
+      "description": "Namespace management",
+      "name": "namespaces"
+    },
+    {
+      "description": "Plan management",
+      "name": "plans"
+    },
+    {
+      "description": "Quota management",
+      "name": "quotas"
+    },
+    {
+      "description": "Token management",
+      "name": "tokens"
+    }
+  ]
+}
